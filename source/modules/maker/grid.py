@@ -2,7 +2,7 @@ import pygame
 from ..display import display
 from ..constants import TILE_SIZE, COLOR_BG
 from ..utils import utils
-from ..ui.levels import Level1
+from ..ui.levels import Level
 from ..entities.tiles import Tile
 from .button import Button
 from .scroll import Scroll
@@ -11,7 +11,7 @@ from .notify import notify
 
 
 class Grid():
-    def __init__(self, level:Level1):         
+    def __init__(self, level:Level):         
         self.size = (display.size[0]*0.7, display.size[1]*0.8)
         self.x_tiles = int(self.size[0]//TILE_SIZE)
         self.y_tiles = int(self.size[1]//TILE_SIZE)
@@ -22,8 +22,8 @@ class Grid():
         self.rect = self.image.get_rect()
         self.rect_orig = self.image.get_rect()
         
-        self.anchor = [0,0]
-        self.level = level
+        self.anchor = pygame.Vector2(0,0)
+        self.level = level        
         self.tiles:list[Tile] = []
         self.clicked = False
         
@@ -52,10 +52,14 @@ class Grid():
         self.horizontal_bar = Scroll((self.rect.w, SIZE_SCROLL))
         self.horizontal_bar.rect.topleft = self.rect.bottomleft
 
-        self.vertical_bar.update_slider_vertical(self.y_tiles, self.anchor, TILE_MAP_LEVEL1[1])
-        self.horizontal_bar.update_slider_horizontal(self.x_tiles, self.anchor, TILE_MAP_LEVEL1[0])
+        self.vertical_bar.update_slider_vertical(self.y_tiles, 
+                                                 self.anchor, TILE_MAP_LEVELS[self.level.idx][1])
+        self.horizontal_bar.update_slider_horizontal(self.x_tiles, 
+                                                     self.anchor, TILE_MAP_LEVELS[self.level.idx][0])
 
 
+    #def change_level(self, level:Level):
+    #    self.level = level
         
 
     def create_collision_tiles(self):
@@ -97,9 +101,11 @@ class Grid():
                 self.clear()             
                 self.update_tiles()
             if anchor_v and event.value == self:                
-                self.vertical_bar.update_slider_vertical(self.y_tiles, self.anchor, TILE_MAP_LEVEL1[1])                
+                self.vertical_bar.update_slider_vertical(self.y_tiles, 
+                                                         self.anchor, TILE_MAP_LEVELS[self.level.idx][1])                
             if anchor_h and event.value == self:                
-                self.horizontal_bar.update_slider_horizontal(self.x_tiles, self.anchor, TILE_MAP_LEVEL1[0])
+                self.horizontal_bar.update_slider_horizontal(self.x_tiles, 
+                                                             self.anchor, TILE_MAP_LEVELS[self.level.idx][0])
             
 
         self.button_left.update(dt)
@@ -110,24 +116,17 @@ class Grid():
         self.vertical_bar.update(dt)
         self.horizontal_bar.update(dt)
 
-        '''for event in self.events_get():
-            if event == Anchor:
-                self.clear()             
-                self.update_tiles()
-            if event == Fill:                
-                self.clear()             
-                self.update_tiles()'''
-
+      
 
     def update_tiles(self):
         for lin in range(self.y_tiles):                       
             for col in range(self.x_tiles):
-                c = self.anchor[0] + col
-                l = self.anchor[1] + lin                
+                c = int(self.anchor.x) + col
+                l = int(self.anchor.y) + lin                
                 tile = self.level.tiles[l][c]
                 if tile:                    
-                    l = tile.rect.left - (self.anchor[0]*TILE_SIZE)
-                    t = tile.rect.top - (self.anchor[1]*TILE_SIZE)
+                    l = tile.rect.left - (int(self.anchor.x)*TILE_SIZE)
+                    t = tile.rect.top - (int(self.anchor.y)*TILE_SIZE)
                     rect = (l, t, tile.rect.w, tile.rect.h)                    
                     self.image.blit(tile.image, rect)
         self.texture_id = utils.update_texture(self.texture_id, self.image)

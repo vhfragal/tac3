@@ -16,7 +16,7 @@ class Info():
         # Initialize a font (system default or custom font file)
         #self.font = pygame.font.SysFont("Arial", 14)
         fps_text = f"FPS:{str(int(display.clock.get_fps()))}"
-        self.font = pygame.font.Font("assets/fonts/Call of Ops Duty II.otf", 200)        
+        self.font = pygame.font.Font("assets/fonts/Call of Ops Duty II.otf", 150)        
         self.image_fps = self.font.render(fps_text, True, pygame.Color("green"))       
         self.rect_fps = self.image_fps.get_rect()
         # Converte e guarda o ID da GPU
@@ -32,7 +32,7 @@ class Info():
         self.texture_id_grid_tiles = utils.surface_to_texture(self.image_grid_tiles)
 
 
-        grid_text = f"{TILE_MAP_LEVEL1}"        
+        grid_text = f"X,Y:{TILE_MAP_LEVELS[self.grid.level.idx]}"        
         self.image_lv1_tiles = self.font2.render(grid_text, True, pygame.Color("green")) 
         self.image_lv1_tiles = pygame.transform.smoothscale_by(self.image_lv1_tiles, 1/4)
         self.rect_lv1_tiles = self.image_lv1_tiles.get_rect()
@@ -62,7 +62,7 @@ class Info():
         self.texture_id_pallet_tiles = utils.surface_to_texture(self.image_pallet_tiles)
 
         # level
-        text = f"LEVEL 1"       
+        text = f"LEVEL {self.grid.level.idx}"       
         self.image_level = self.font2.render(text, True, pygame.Color("green")) 
         self.image_level = pygame.transform.smoothscale_by(self.image_level, 1/4)
         self.rect_level = self.image_level.get_rect()
@@ -107,17 +107,7 @@ class Info():
                 self.texture_id_anchor_tiles_pallet = utils.update_texture(self.texture_id_anchor_tiles_pallet,
                                                                             self.image_anchor_tiles_pallet)
 
-        '''for event in self.events_get():
-            if event == Anchor:
-                # atualizar anchor - condicao de evento                
-                grid_text = f"{self.grid.anchor}"                
-                self.image_anchor_tiles = self.font2.render(grid_text, True, pygame.Color("green")) 
-                self.image_anchor_tiles = pygame.transform.smoothscale_by(self.image_anchor_tiles, 1/4)
-                self.rect_anchor_tiles = self.image_anchor_tiles.get_rect()
-                # Converte e guarda o ID da GPU
-                self.texture_id_anchor_tiles = utils.update_texture(self.texture_id_anchor_tiles, self.image_anchor_tiles)'''
-        
-    
+       
 
     def draw(self):
         # topleft position

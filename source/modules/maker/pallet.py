@@ -19,7 +19,7 @@ class Pallet():
         self.rect = self.image.get_rect()
         self.rect_orig = self.image.get_rect()
         
-        self.anchor = [0,0] 
+        self.anchor = pygame.Vector2(0,0)        
         self.tilemap = tilemap   
         self.tilemap.create_tile_matrix(self.x_tiles) 
                         
@@ -35,6 +35,7 @@ class Pallet():
 
         # set first tile as default
         self.select:Tile = self.tilemap.tiles[0][0]
+        self.select_pos = (0,0)
         self.update_select()
          
 
@@ -86,21 +87,14 @@ class Pallet():
         self.vertical_bar.update(dt)
         #self.horizontal_bar.update(dt)
         
-        '''for event in self.events_get():
-            if event == Anchor:
-                self.clear()             
-                self.update_tiles()
-            if event == Select:                      
-                self.clear()             
-                self.update_tiles()
-                self.update_select()'''
-
                
-    def update_select(self):       
+    def update_select(self):
+        lin, col = self.select_pos 
+        self.select = self.tilemap.tiles[lin][col]      
         tile = self.select               
         if tile:
             x,y,w,h = tile.rect      
-            y -= self.anchor[1] * TILE_SIZE
+            y -= int(self.anchor.y) * TILE_SIZE
             pygame.draw.rect(self.image, "gold", (x,y,w,h), 5)   
             #pygame.draw.rect(self.image, "gold", tile.rect, 5)     
         self.texture_id = utils.update_texture(self.texture_id, self.image)
@@ -109,36 +103,17 @@ class Pallet():
     def update_tiles(self):
         for lin in range(self.y_tiles):                       
             for col in range(self.x_tiles):
-                c = self.anchor[0] + col
-                l = self.anchor[1] + lin                        
+                c = int(self.anchor.x) + col
+                l = int(self.anchor.y) + lin                        
                 tile = self.tilemap.tiles[l][c]
                 if tile:                    
-                    l = tile.rect.left - (self.anchor[0]*TILE_SIZE)
-                    t = tile.rect.top - (self.anchor[1]*TILE_SIZE)
+                    l = tile.rect.left - (int(self.anchor.x)*TILE_SIZE)
+                    t = tile.rect.top - (int(self.anchor.y)*TILE_SIZE)
                     rect = (l, t, tile.rect.w, tile.rect.h)                    
                     self.image.blit(tile.image, rect)
         self.texture_id = utils.update_texture(self.texture_id, self.image)
 
-        '''i = 1
-        self.tiles:list[Tile] = []
-        print(self.x_tiles, self.anchor[1], len(self.tilemap.codes))
-        for lin in range(self.y_tiles): 
-            if i >= len(self.tilemap.codes): break                      
-            for col in range(self.x_tiles):
-                if i >= len(self.tilemap.codes): break
-                idx = (i+self.x_tiles*self.anchor[1])
-                if idx >= len(self.tilemap.codes): break
-                tile = Tile(*self.tilemap.codes[idx])   
-                print(idx)            
-                if tile: 
-                    self.tiles.append(tile)                   
-                    l = col*TILE_SIZE - (self.anchor[0]*TILE_SIZE)
-                    t = lin*TILE_SIZE - (self.anchor[1]*TILE_SIZE)
-                    tile.rect.topleft = (l, t)                    
-                    self.image.blit(tile.image, tile.rect)
-                i += 1
-        self.texture_id = utils.update_texture(self.texture_id, self.image)'''
-   
+         
 
     def draw(self):
         #x,y,w,h = self.rect.x, self.rect.y, self.rect.w, self.rect.h        

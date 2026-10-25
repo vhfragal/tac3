@@ -1,5 +1,5 @@
 import pygame
-from ..constants import *#TILE_MAP_LEVEL1, TILE_SIZE, TILE_MAP_LEVEL1
+from ..constants import *
 from ..entities.tiles import Tile
 from .editor import editor
 from .notify import notify
@@ -41,12 +41,12 @@ def scroll_pallet(event:pygame.Event):
     if event.type == pygame.MOUSEWHEEL:
         if event.y == -1:    # down
             max = TILE_MAP_PALLET - editor.pallet.y_tiles
-            if editor.pallet.anchor[1] < max:
-                editor.pallet.anchor[1] += 1
+            if editor.pallet.anchor.y < max:
+                editor.pallet.anchor.y += 1
                 notify.add_event(EVENT_ANCHOR_VERTICAL, editor.pallet)
         if event.y == 1: # up
-            if editor.pallet.anchor[1] > 0:
-                editor.pallet.anchor[1] -= 1
+            if editor.pallet.anchor.y > 0:
+                editor.pallet.anchor.y -= 1
                 notify.add_event(EVENT_ANCHOR_VERTICAL, editor.pallet)
         
 
@@ -72,16 +72,17 @@ def click_slider(x:int, y:int, event:pygame.Event):
         editor.pallet.vertical_bar.unset_clicked()
         return 
     if event.type != pygame.MOUSEBUTTONDOWN: return 
+    if not pygame.mouse.get_pressed()[0]: return
 
     # horizontal bar - grid
     if editor.grid.horizontal_bar.rect.collidepoint(x,y):
         editor.grid.horizontal_bar.set_clicked()
-        move_bar_horizontal(x, editor.grid, TILE_MAP_LEVEL1[0])
+        move_bar_horizontal(x, editor.grid, TILE_MAP_LEVELS[editor.level_idx][0])
 
     # vertical
     if editor.grid.vertical_bar.rect.collidepoint(x,y):
         editor.grid.vertical_bar.set_clicked()
-        move_bar_vertical(y, editor.grid, TILE_MAP_LEVEL1[1])
+        move_bar_vertical(y, editor.grid, TILE_MAP_LEVELS[editor.level_idx][1])
 
     # pallet
     if editor.pallet.vertical_bar.rect.collidepoint(x,y):
@@ -93,9 +94,9 @@ def click_slider(x:int, y:int, event:pygame.Event):
 
 def hold_slider(x:int, y:int):
     if editor.grid.horizontal_bar.clicked:        
-        move_bar_horizontal(x, editor.grid, TILE_MAP_LEVEL1[0])
+        move_bar_horizontal(x, editor.grid, TILE_MAP_LEVELS[editor.level_idx][0])
     if editor.grid.vertical_bar.clicked:        
-        move_bar_vertical(y, editor.grid, TILE_MAP_LEVEL1[1])
+        move_bar_vertical(y, editor.grid, TILE_MAP_LEVELS[editor.level_idx][1])
 
     if editor.pallet.vertical_bar.clicked:        
         move_bar_vertical(y, editor.pallet, TILE_MAP_PALLET)
@@ -113,7 +114,7 @@ def move_bar_vertical(y, grid:Grid|Pallet, max_y):
         final_pos -= (SIZE_SCROLL//2)
 
     percentage = ((y+delta)-init_pos) / (final_pos-init_pos)
-    grid.anchor[1] = int((max_y - grid.y_tiles)*percentage)
+    grid.anchor.y = int((max_y - grid.y_tiles)*percentage)
     notify.add_event(EVENT_ANCHOR_VERTICAL, grid)
         
 
@@ -130,7 +131,7 @@ def move_bar_horizontal(x, grid:Grid|Pallet, max_x):
         final_pos -= (SIZE_SCROLL//2)
         
     percentage = ((x+delta)-init_pos) / (final_pos-init_pos)
-    grid.anchor[0] = int((max_x - grid.x_tiles)*percentage)
+    grid.anchor.x = int((max_x - grid.x_tiles)*percentage)
     notify.add_event(EVENT_ANCHOR_HORIZONTAL, grid)
 
 
@@ -170,36 +171,20 @@ def click_buttons(x, y, event:pygame.Event):
 def hold_buttons(x:int, y:int):
     if editor.grid.button_left.working and editor.grid.button_left.clicked:
         if editor.grid.button_left.rect.collidepoint(x,y):        
-            editor.grid.anchor[0] -= 1
-            #notify.add_event(EVENT_BUTTON_CLICKED, editor.grid.button_left)
+            editor.grid.anchor.x -= 1
             notify.add_event(EVENT_ANCHOR_HORIZONTAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_clicked_left.event()
-            #editor.notify_anchor_horizontal.event()
     if editor.grid.button_up.working and editor.grid.button_up.clicked:
         if editor.grid.button_up.rect.collidepoint(x,y):        
-            editor.grid.anchor[1] -= 1
-            #notify.add_event(EVENT_BUTTON_CLICKED, editor.grid.button_up)
+            editor.grid.anchor.y -= 1
             notify.add_event(EVENT_ANCHOR_VERTICAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_clicked_up.event()
-            #editor.notify_anchor_vertical.event()
     if editor.grid.button_down.working and editor.grid.button_down.clicked:
         if editor.grid.button_down.rect.collidepoint(x,y):        
-            editor.grid.anchor[1] += 1
-            #notify.add_event(EVENT_BUTTON_CLICKED, editor.grid.button_down)
+            editor.grid.anchor.y += 1
             notify.add_event(EVENT_ANCHOR_VERTICAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_clicked_down.event()
-            #editor.notify_anchor_vertical.event()
     if editor.grid.button_right.working and editor.grid.button_right.clicked:
         if editor.grid.button_right.rect.collidepoint(x,y):        
-            editor.grid.anchor[0] += 1
-            #notify.add_event(EVENT_BUTTON_CLICKED, editor.grid.button_right)
+            editor.grid.anchor.x += 1
             notify.add_event(EVENT_ANCHOR_HORIZONTAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_clicked_right.event()
-            #editor.notify_anchor_horizontal.event()
 
 
 
@@ -211,30 +196,26 @@ def check_over_buttons(x:int, y:int):
         
     if editor.grid.button_left.rect.collidepoint(x,y): 
         notify.add_event(EVENT_BUTTON_OVER, editor.grid.button_left)
-        #editor.notify_over_left.event()
     if editor.grid.button_up.rect.collidepoint(x,y): 
         notify.add_event(EVENT_BUTTON_OVER, editor.grid.button_up)
-        #editor.notify_over_up.event()
     if editor.grid.button_down.rect.collidepoint(x,y): 
         notify.add_event(EVENT_BUTTON_OVER, editor.grid.button_down)
-        #editor.notify_over_down.event()
     if editor.grid.button_right.rect.collidepoint(x,y): 
         notify.add_event(EVENT_BUTTON_OVER, editor.grid.button_right)
-        #editor.notify_over_right.event()
 
 
 def check_working_buttons():
-    if editor.grid.anchor[0] == 0: editor.grid.button_left.set_working(False)
+    if editor.grid.anchor.x == 0: editor.grid.button_left.set_working(False)
     else: editor.grid.button_left.set_working(True)
 
-    if editor.grid.anchor[1] == 0: editor.grid.button_up.set_working(False)
+    if editor.grid.anchor.y == 0: editor.grid.button_up.set_working(False)
     else: editor.grid.button_up.set_working(True)
 
-    if editor.grid.anchor[1] == (TILE_MAP_LEVEL1[1]-editor.grid.y_tiles): 
+    if editor.grid.anchor.y == (TILE_MAP_LEVELS[editor.level_idx][1]-editor.grid.y_tiles): 
         editor.grid.button_down.set_working(False)
     else: editor.grid.button_down.set_working(True)
 
-    if editor.grid.anchor[0] == (TILE_MAP_LEVEL1[0]-editor.grid.x_tiles): 
+    if editor.grid.anchor.x == (TILE_MAP_LEVELS[editor.level_idx][0]-editor.grid.x_tiles): 
         editor.grid.button_right.set_working(False)
     else: editor.grid.button_right.set_working(True)
     
@@ -247,13 +228,12 @@ def erase_tile(x:int, y:int):
     for tile in editor.grid.tiles:
         if tile.rect.collidepoint(x,y): 
             col, lin = tile.desc.split(",")            
-            col = int(col) + editor.grid.anchor[0]
-            lin = int(lin) + editor.grid.anchor[1]                   
+            col = int(col) + int(editor.grid.anchor.x)
+            lin = int(lin) + int(editor.grid.anchor.y)              
             if editor.grid.level.tiles[lin][col]: 
                 editor.grid.level.tiles[lin][col] = None
-                #editor.notify_fill.event()
                 notify.add_event(EVENT_GRID_FILL, None)
-                editor.level1.save_level()                           
+                #editor.level1.save_level()                           
             break
 
 
@@ -265,16 +245,15 @@ def fill_tile(x:int, y:int):
     for tile in editor.grid.tiles:
         if tile.rect.collidepoint(x,y):                                
             col, lin = tile.desc.split(",")
-            col = int(col) + editor.grid.anchor[0]
-            lin = int(lin) + editor.grid.anchor[1]
+            col = int(col) + int(editor.grid.anchor.x)
+            lin = int(lin) + int(editor.grid.anchor.y)
             tile = Tile(*editor.pallet.select.get())
             editor.grid.level.tiles[lin][col] = tile                            
             left = (col) * TILE_SIZE
             top = (lin) * TILE_SIZE
             editor.grid.level.tiles[lin][col].rect.topleft = (left, top)
-            #editor.notify_fill.event()   
             notify.add_event(EVENT_GRID_FILL, None) 
-            editor.level1.save_level()                        
+            #editor.level1.save_level()                        
             break
 
 
@@ -282,16 +261,16 @@ def save_map(x:int, y:int, event:pygame.Event):
     if event.type != pygame.MOUSEBUTTONDOWN: return  
 
     if editor.button_save.rect.collidepoint(x,y):
-        editor.level1.save_level()
-        #editor.notify_message.event()
+        editor.level.save_level()
+        editor.save_config()
         notify.add_event(EVENT_BUTTON_MESSAGE, editor.button_save)
 
 
 def load_map(x:int, y:int, event:pygame.Event):
     if event.type != pygame.MOUSEBUTTONDOWN: return  
 
-    if editor.button_load.rect.collidepoint(x,y):
-        editor.level1.load_level()        
+    if editor.button_load.rect.collidepoint(x,y):        
+        editor.change_level()        
         notify.add_event(EVENT_BUTTON_MESSAGE, editor.button_load)
 
 
@@ -303,27 +282,13 @@ def select_tile(x:int, y:int, event:pygame.Event):
     for tile in editor.pallet.tiles:    
         if tile.rect.collidepoint(x,y):                                            
             col, lin = tile.desc.split(",")
-            col = int(col) + editor.pallet.anchor[0]
-            lin = int(lin) + editor.pallet.anchor[1]
-            editor.pallet.select = editor.pallet.tilemap.tiles[lin][col]                          
+            col = int(col) + int(editor.pallet.anchor.x)
+            lin = int(lin) + int(editor.pallet.anchor.y)
+            #editor.pallet.select = editor.pallet.tilemap.tiles[lin][col]  
+            editor.pallet.select_pos = (lin,col)                        
             notify.add_event(EVENT_PALLET_SELECT, editor.pallet)              
             break
-    
-    '''for tile in editor.pallet.tiles:
-        if tile.rect.collidepoint(x,y):
-            editor.pallet.select = tile            
-            notify.add_event(EVENT_PALLET_SELECT, editor.pallet)                        
-            break'''
-    
-    '''for tile in editor.pallet.tiles:
-        l = editor.pallet.rect.left + tile.rect.left
-        t = editor.pallet.rect.top + tile.rect.top                        
-        r = pygame.rect.Rect(l,t, tile.rect.w, tile.rect.h)
-        if r.collidepoint(x,y):
-            editor.pallet.select = tile
-            #editor.notify_select.event() 
-            notify.add_event(EVENT_PALLET_SELECT, editor.pallet)
-            break'''
+      
 
 
 def exit(event:pygame.Event):
@@ -337,28 +302,21 @@ def exit(event:pygame.Event):
 def handle_keys():
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        if editor.grid.anchor[0] > 0:
-            editor.grid.anchor[0] -= 1
-            notify.add_event(EVENT_ANCHOR_HORIZONTAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_anchor_horizontal.event()
+        if editor.grid.anchor.x > 0:
+            editor.grid.anchor.x -= 1
+            notify.add_event(EVENT_ANCHOR_HORIZONTAL, editor.grid)           
     if keys[pygame.K_RIGHT]:
-        max = TILE_MAP_LEVEL1[0] - editor.grid.x_tiles
-        if editor.grid.anchor[0] < max:
-            editor.grid.anchor[0] += 1
-            notify.add_event(EVENT_ANCHOR_HORIZONTAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_anchor_horizontal.event()
+        max = TILE_MAP_LEVELS[editor.level_idx][0] - editor.grid.x_tiles
+        if editor.grid.anchor.x < max:
+            editor.grid.anchor.x += 1
+            notify.add_event(EVENT_ANCHOR_HORIZONTAL, editor.grid)            
     if keys[pygame.K_UP]:
-        if editor.grid.anchor[1] > 0:
-            editor.grid.anchor[1] -= 1
-            notify.add_event(EVENT_ANCHOR_VERTICAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_anchor_vertical.event()
+        if editor.grid.anchor.y > 0:
+            editor.grid.anchor.y -= 1
+            notify.add_event(EVENT_ANCHOR_VERTICAL, editor.grid)          
     if keys[pygame.K_DOWN]:
-        max = TILE_MAP_LEVEL1[1] - editor.grid.y_tiles
-        if editor.grid.anchor[1] < max:
-            editor.grid.anchor[1] += 1
+        max = TILE_MAP_LEVELS[editor.level_idx][1] - editor.grid.y_tiles
+        if editor.grid.anchor.y < max:
+            editor.grid.anchor.y += 1
             notify.add_event(EVENT_ANCHOR_VERTICAL, editor.grid)
-            #editor.notify_anchor.event()
-            #editor.notify_anchor_vertical.event()
+           

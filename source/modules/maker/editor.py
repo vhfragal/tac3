@@ -4,15 +4,21 @@ from .grid import Grid
 from ..entities.tiles import TileMap
 from OpenGL.GL import *
 from ..ui.background import Background
-from ..ui.levels import Level1
+from ..ui.levels import Level
 from .notify import notify
 from .pallet import Pallet
 from .button import Button
 from ..constants import *
+from ..utils import utils
+import json
 
 class Editor:
+    def __init__(self):
+        pass
+
     def create(self):
-        self.running = True         
+        self.running = True
+        self.level_idx = 1         
 
         display.create_display()
         self.bg = Background(*display.size, "Black")
@@ -20,49 +26,84 @@ class Editor:
         # load tiles
         self.tile_map = TileMap()        
         self.tile_map.load_sprite_maps()
-        self.level1 = Level1()
-        if not self.level1.load(self.tile_map):
-            self.level1.load(self.tile_map)
-
+        self.level = Level(self.level_idx, self.tile_map)
+        
         # assets        
-        self.grid = Grid(self.level1)        
+        self.grid = Grid(self.level)        
         self.pallet = Pallet(self.tile_map)   
-        self.info = Info(self.grid, self.pallet)     
+        self.info = Info(self.grid, self.pallet) 
+
+        self.load_config()       
       
         text, message = "Save", "Map saved!!!"
         self.button_save = Button(text=text, message=message, icon=ICON_SAVE)
         self.button_save.rect.topleft = (0, display.size[1]-SIZE_ICON[1])
 
-        text, message = "Load", "Map loaded!!!"
+        text, message = "Load next", "Map loaded!!!"
         self.button_load = Button(text=text, message=message, icon=ICON_LOAD)
         self.button_load.rect.topleft = (self.button_save.rect.w, display.size[1]-SIZE_ICON[1])
+
+
+    def load_config(self):
+        self.config = {}
+        try:
+            resource = utils.get_full_path(FILE_CONFIG)            
+            with open(resource, 'r', encoding='utf-8') as file:
+                self.config = json.load(file)
+                self.level_idx = self.config["level"]
+                self.grid.anchor.xy = self.config["anchor_grid"]
+                self.pallet.anchor.xy = self.config["anchor_pallet"]
+                self.pallet.select_pos = self.config["select_pallet"]
+                self.level.change_level(self.level_idx)
+                self.info = Info(self.grid, self.pallet)                
+                self.refresh()                            
+        except FileNotFoundError:
+            print(f"Warning: The file '{resource}' was not found. Creating...")
+            # create first config            
+            self.save_config()
+            return False
+        return True
+
+
+    def refresh(self):        
+        notify.add_event(EVENT_PALLET_SELECT, editor.pallet)
+        notify.add_event(EVENT_ANCHOR_HORIZONTAL, editor.grid)
+        notify.add_event(EVENT_ANCHOR_VERTICAL, editor.grid)
+        notify.add_event(EVENT_ANCHOR_VERTICAL, editor.pallet)
+        notify.add_event(EVENT_GRID_FILL, None) 
+
+
+    def change_level(self):
+        self.level_idx = ((self.level_idx) % (len(FILE_LEVELS)-1)) + 1
+        
+        self.level.change_level(self.level_idx)
+        self.grid.anchor.xy = 0,0
+        self.info = Info(self.grid, self.pallet) 
+        #print(self.level_idx, self.grid.anchor, self.grid.level.idx)
+
+        self.config["level"] = self.level_idx    
+        self.config["anchor_grid"] = 0,0
+        self.config["anchor_pallet"] = 0,0
+        self.config["select_pallet"] = 0,0
+        resource = utils.get_full_path(FILE_CONFIG)            
+        with open(resource, 'w', encoding='utf-8') as file:
+            json.dump(self.config, file, indent=4)
+
+        self.refresh()
+
+
+
+    def save_config(self):        
+        self.config["level"] = self.level_idx    
+        self.config["anchor_grid"] = self.grid.anchor.x, self.grid.anchor.y
+        self.config["anchor_pallet"] = self.pallet.anchor.x, self.pallet.anchor.y
+        self.config["select_pallet"] = self.pallet.select_pos
+        resource = utils.get_full_path(FILE_CONFIG)            
+        with open(resource, 'w', encoding='utf-8') as file:
+            json.dump(self.config, file, indent=4)
+
         
         
-
-        '''self.notify_setup()
-
-
-    def notify_setup(self):              
-        self.notify_anchor = Notify([self.grid, self.info], Anchor)
-        self.notify_select = Notify([self.pallet], Select)
-        self.notify_fill = Notify([self.grid], Fill)
-        self.notify_message = Notify([self.button_save], Message)
-        self.notify_over_save = Notify([self.button_save], Over)
-        self.notify_clicked_save = Notify([self.button_save], Clicked)
-        
-        self.notify_over_left = Notify([self.button_left], Over)
-        self.notify_over_up = Notify([self.button_up], Over)
-        self.notify_over_down = Notify([self.button_down], Over)
-        self.notify_over_right = Notify([self.button_right], Over)
-
-        self.notify_clicked_left = Notify([self.button_left], Clicked)
-        self.notify_clicked_up = Notify([self.button_up], Clicked)
-        self.notify_clicked_down = Notify([self.button_down], Clicked)
-        self.notify_clicked_right = Notify([self.button_right], Clicked)
-
-        self.notify_anchor_vertical = Notify([self.grid_vertical_bar], AnchorV)
-        self.notify_anchor_horizontal = Notify([self.grid_horizontal_bar], AnchorH)'''
-
 
     def update(self, dt:float):
         self.info.update(dt)

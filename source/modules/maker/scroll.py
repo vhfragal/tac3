@@ -25,11 +25,11 @@ class Scroll():
        
        
     
-    def update_slider_vertical(self, y_tiles, anchor, max_y):        
+    def update_slider_vertical(self, y_tiles:int, anchor:pygame.Vector2, max_y:int):        
         # position anchor - topleft
         final_pos = self.rect.h - self.rect_slider.h
         max = max_y - y_tiles
-        percentage = anchor[1] / max
+        percentage = anchor.y / max
         self.rect_slider.topleft = (0, int(final_pos*percentage)) 
         
         self.image.fill("black") # clear
@@ -39,10 +39,10 @@ class Scroll():
         
 
 
-    def update_slider_horizontal(self, x_tiles, anchor, max_x):                
+    def update_slider_horizontal(self, x_tiles:int, anchor:pygame.Vector2, max_x:int):                
         final_pos = self.rect.w - self.rect_slider.w
         max = max_x - x_tiles
-        percentage = anchor[0] / max
+        percentage = anchor.x / max
         self.rect_slider.topleft = (int(final_pos*percentage), 0)
 
         self.image.fill("black")
@@ -59,19 +59,7 @@ class Scroll():
       
     def update(self, dt:float): 
         pass       
-        #self.clicked = False
-        '''for event in notify.get_events():
-            if event.type == EVENT_ANCHOR_VERTICAL:
-                self.update_slider_vertical()  
-            if event.type == EVENT_ANCHOR_HORIZONTAL:
-                self.update_slider_horizontal() '''
-        '''for event in self.events_get():            
-            if event == Clicked:
-                self.clicked = True
-            if event == AnchorV:
-                self.update_slider_vertical()                
-            if event == AnchorH:
-                self.update_slider_horizontal()'''
+        
 
 
     def draw(self):            

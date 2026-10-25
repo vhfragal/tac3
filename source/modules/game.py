@@ -4,7 +4,7 @@ from .entities.player import Player
 from .ui.background import Background
 from .display import display
 from .entities.tiles import TileMap
-from .ui.levels import Level1
+from .ui.levels import Level
 from .ui.panel import Panel
 from .config.sounds import sounds
 
@@ -12,6 +12,7 @@ from .config.sounds import sounds
 class Game():
     def __init__(self):
         self.running = False
+        self.level_idx = 1
 
     def init_assets(self): 
         self.bg = Background(*display.size)        
@@ -21,11 +22,11 @@ class Game():
         # load tiles
         self.tile_map = TileMap()        
         self.tile_map.load_sprite_maps()
-        self.level1 = Level1()
-        if not self.level1.load(self.tile_map):
-            self.level1.load(self.tile_map)
+        self.level = Level(self.level_idx, self.tile_map)
+        
+        self.bg.add_cenario(self.level.tiles)
 
-        self.bg.add_cenario(self.level1.tiles)
+        #self.load_config()
 
               
 

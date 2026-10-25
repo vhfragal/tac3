@@ -85,28 +85,18 @@ class Button():
 
     
     def update(self, dt:float):
-        self.over = False 
-        #self.clicked = False
+        self.over = False         
 
         for event in notify.get_events():
             message = event.type == EVENT_BUTTON_MESSAGE
             over = event.type == EVENT_BUTTON_OVER
-            #clicked = event.type == EVENT_BUTTON_CLICKED
-
-            if message and event.value == self: 
-                self.counter = self.delay
+           
+            if message:
+                if event.value == self: self.counter = self.delay
+                else: self.counter = 0
             if over and event.value == self:
                 self.over = True
-            #if clicked and event.value == self:
-            #    self.clicked = True
-
-        '''for event in self.events_get():
-            if event == Message and self.message != "":                
-                self.counter = self.delay
-            if event == Over:  
-                self.over = True
-            if event == Clicked:
-                self.clicked = True'''
+           
 
         if self.counter > 0:
             self.counter -= dt
