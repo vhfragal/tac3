@@ -10,6 +10,7 @@ def level_maker():
     pygame.font.init()
     
     editor.create()
+
     """O Game Loop Principal"""
     #try:           
     while editor.running:
@@ -22,13 +23,9 @@ def level_maker():
         editor.running = False
         pygame.quit()
         sys.exit()'''
-        
+
 
 def update(dt):
-    """Loop de Atualização: Onde a lógica matemática acontece"""
-    # new thread!                
-    # check_collisions()
-    #game.player.update(dt)
     editor.update(dt)
 
         

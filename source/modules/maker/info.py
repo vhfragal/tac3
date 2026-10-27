@@ -24,7 +24,7 @@ class Info():
 
 
         grid_text = f"({grid.x_tiles},{grid.y_tiles})"
-        self.font2 = pygame.font.Font("assets/fonts/Call of Ops Duty II.otf", 150)
+        self.font2 = pygame.font.Font("assets/fonts/Call of Ops Duty II.otf", 130)
         self.image_grid_tiles = self.font2.render(grid_text, True, pygame.Color("green")) 
         self.image_grid_tiles = pygame.transform.smoothscale_by(self.image_grid_tiles, 1/4)
         self.rect_grid_tiles = self.image_grid_tiles.get_rect()

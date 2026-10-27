@@ -14,7 +14,7 @@ class Display():
 
         # display info and sizes
         num_displays = pygame.display.get_num_displays()    
-        self.selected_display = 0   
+        self.selected_display = 1   
         desktop_sizes = pygame.display.get_desktop_sizes()                
         self.size = desktop_sizes[self.selected_display]
         self.all_resolutions = pygame.display.list_modes(display=self.selected_display)
