@@ -4,7 +4,7 @@ from ..constants import *
 from ..utils import utils
 from .grid import Grid
 from .pallet import Pallet
-from .notify import notify
+from ..events.notify import notify
 
 class Info():
     def __init__(self, grid:Grid, pallet:Pallet):   

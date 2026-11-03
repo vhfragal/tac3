@@ -145,6 +145,17 @@ class Utils():
         glEnd()
         
         glDisable(GL_TEXTURE_2D)
+
+
+    def draw_rect(self, x, y, w, h, color):
+        """Draws a solid colored rectangle at screen coordinates."""
+        glColor4f(color[0]/255.0, color[1]/255.0, color[2]/255.0, 1.0)
+        glBegin(GL_QUADS)
+        glVertex2f(x, y)          # Top-Left
+        glVertex2f(x + w, y)      # Top-Right
+        glVertex2f(x + w, y + h)  # Bottom-Right
+        glVertex2f(x, y + h)      # Bottom-Left
+        glEnd()
               
 
 utils = Utils()

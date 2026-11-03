@@ -6,8 +6,8 @@ from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT
 
 
 def level_maker():
-    pygame.display.init()
-    pygame.font.init()
+    #pygame.display.init()
+    #pygame.font.init()
     
     editor.create()
 

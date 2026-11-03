@@ -2,7 +2,7 @@ import pygame
 from ..utils import utils
 from ..display import display
 from ..constants import *
-from .notify import notify
+from ..events.notify import notify
 
 class Button():
     def __init__(self,                  

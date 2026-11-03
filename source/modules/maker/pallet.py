@@ -3,7 +3,7 @@ from ..display import display
 from ..constants import *
 from ..utils import utils
 from ..entities.tiles import TileMap, Tile
-from .notify import notify
+from ..events.notify import notify
 from .scroll import Scroll
 
 

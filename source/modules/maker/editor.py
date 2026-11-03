@@ -5,7 +5,7 @@ from ..entities.tiles import TileMap
 from OpenGL.GL import *
 from ..ui.background import Background
 from ..ui.levels import Level
-from .notify import notify
+from ..events.notify import notify
 from .pallet import Pallet
 from .button import Button
 from ..constants import *

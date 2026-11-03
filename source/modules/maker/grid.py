@@ -7,7 +7,7 @@ from ..entities.tiles import Tile
 from .button import Button
 from .scroll import Scroll
 from ..constants import *
-from .notify import notify
+from ..events.notify import notify
 
 
 class Grid():
@@ -58,9 +58,6 @@ class Grid():
                                                      self.anchor, TILE_MAP_LEVELS[self.level.idx][0])
 
 
-    #def change_level(self, level:Level):
-    #    self.level = level
-        
 
     def create_collision_tiles(self):
         for lin in range(self.y_tiles):                       
@@ -122,7 +119,8 @@ class Grid():
         for lin in range(self.y_tiles):                       
             for col in range(self.x_tiles):
                 c = int(self.anchor.x) + col
-                l = int(self.anchor.y) + lin                
+                l = int(self.anchor.y) + lin     
+                #print(l,c, len(self.level.tiles), len(self.level.tiles[0]))           
                 tile = self.level.tiles[l][c]
                 if tile:                    
                     l = tile.rect.left - (int(self.anchor.x)*TILE_SIZE)

@@ -1,7 +1,7 @@
 import pygame
 from ..constants import COLOR_BG
 from ..utils import utils
-from ..entities.tiles import Tile
+#from ..entities.tiles import Tile
 
 class Background():
     def __init__(self, w:int, h:int, color=COLOR_BG):
@@ -12,14 +12,6 @@ class Background():
 
         # Converte e guarda o ID da GPU
         self.texture_id = utils.surface_to_texture(self.image)        
-        
-
-    def add_cenario(self, tiles:list[list[Tile]]):
-        for line in tiles:
-            for tile in line:
-                if tile: self.image.blit(tile.image, tile.rect)
-
-        self.texture_id = utils.surface_to_texture(self.image)
         
 
     def draw(self):

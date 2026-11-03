@@ -2,7 +2,7 @@ import pygame
 from ..constants import *
 from ..entities.tiles import Tile
 from .editor import editor
-from .notify import notify
+from ..events.notify import notify
 from .grid import Grid
 from .pallet import Pallet
 

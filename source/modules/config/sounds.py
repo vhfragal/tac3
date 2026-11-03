@@ -14,7 +14,7 @@ class Sounds():
         self.sound_wow = pygame.mixer.Sound(os.path.abspath('assets/sounds/Wow.wav'))
         self.sound_wow.set_volume(0.1)
 
-        self.sound_jump = pygame.mixer.Sound(os.path.abspath('assets/sounds/estalo.mp3'))
+        self.sound_jump = pygame.mixer.Sound(os.path.abspath('assets/sounds/jump.wav'))
         self.sound_jump.set_volume(0.3)
 
         self.sound_j1 = pygame.mixer.Sound(os.path.abspath('assets/sounds/j1.wav'))
@@ -31,9 +31,26 @@ class Sounds():
         #pygame.mixer.music.load(os.path.abspath('assets/sounds/Smooth Criminal.wav'))
         pygame.mixer.music.load(os.path.abspath('assets/sounds/_LAmourToujours.mp3'))
 
-    def play_music(self):        
+
+    #def play_music(self):    
+    #    pygame.mixer.music.load(os.path.abspath('assets/sounds/Smooth Criminal.wav'))    
+    #    pygame.mixer.music.play(-1, 0.0)
+    #    pygame.mixer.music.set_volume(0.2)
+
+
+
+    def play_menu_music(self):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('assets/sounds/Billie Jean.wav')
         pygame.mixer.music.play(-1, 0.0)
         pygame.mixer.music.set_volume(0.2)
+
+    def play_new_game_music(self):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('assets/sounds/Smooth Criminal.wav')
+        pygame.mixer.music.play(-1, 0.0)
+        pygame.mixer.music.set_volume(0.2)
+
 
     def play_sound(self,
                     sound:pygame.mixer.Sound,
