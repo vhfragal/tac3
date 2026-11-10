@@ -57,7 +57,7 @@ class TileMap():
         h = [TILE_CROP] * len(left)
         self.objects, self.objects_mask = self.cut_sub_surface(self.map_items2, left, top, w, h)        
         for surf in self.objects:
-            self.codes.append((i, surf, f"collide {i}"))
+            self.codes.append((i, surf, f"{TILE_TYPE_GROUND} {i}"))
             i += 1
 
         # objects that not collide - background

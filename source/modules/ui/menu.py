@@ -71,6 +71,9 @@ class Basic_menu_all():
         """Loop de Renderização: Onde desenhamos na tela"""                 
         # Render Phase
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glLoadIdentity()
+        glTranslatef(0, 0, 0)
+                
         # ordem importa - cada layer por vez - pode organizar
         self.bg.draw()       
 

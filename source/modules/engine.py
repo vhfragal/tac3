@@ -32,6 +32,7 @@ class GameEngine:
         #self.main_loop()
                 
         while not game.running:
+            game.camera.reset_camera()            
             self.menu_selector()
 
 
@@ -157,12 +158,13 @@ class GameEngine:
 
     def handle_events(self):
         """Loop de Eventos: Inputs globais do sistema e interrupções"""
-        net_thread = threading.Thread(
-            target=inputs, args=()
-        )
-        net_thread.daemon = True
-        net_thread.start()
-        #inputs()
+        #net_thread = threading.Thread(
+        #    target=inputs, args=()
+        #)
+        #net_thread.daemon = True
+        #net_thread.start()
+        inputs()
+
 
     def update(self, dt):
         """Loop de Atualização: Onde a lógica matemática acontece"""
@@ -172,20 +174,9 @@ class GameEngine:
         
             
     def draw(self):
-        """Loop de Renderização: Onde desenhamos na tela"""                 
-        # Render Phase
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-        # Save the base matrix state
-        glPushMatrix()
-        # Apply camera translations (moves the world relative to camera)
-        glTranslatef(-game.player.camera_x, 0, 0)
-        
+        """Loop de Renderização: Onde desenhamos na tela"""   
         # ordem importa - cada layer por vez - pode organizar
         game.draw()
-
-        # Restore matrix state to clear the translation for UI elements
-        glPopMatrix()
 
         pygame.display.flip()
         # forçar sincronização de hardware CPU e GPU - chamadas assincronas

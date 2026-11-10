@@ -8,6 +8,7 @@ isort==8.0.1
 mccabe==0.7.0
 moderngl==5.13.0
 numpy==2.5.1
+opencv-python==5.0.0.93
 packaging==26.2
 patchelf==0.17.2.4
 platformdirs==4.11.4

@@ -30,7 +30,7 @@ def create_light_surf(radius, color):
 # Cores do cenário
 DARK_BG = (15, 15, 25)
 WALL_COLOR = (70, 70, 85)
-LIGHT_COLOR = (255, 230, 180) # Luz quente/amarelada
+LIGHT_COLOR = (5, 30, 180) # Luz quente/amarelada
 
 # Raio da nossa fonte de luz
 LIGHT_RADIUS = 200

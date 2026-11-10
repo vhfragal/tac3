@@ -9,6 +9,8 @@ from .config.sounds import sounds
 from .constants import *
 from .ui.cenario import Cenario
 from .ui.camera import Camera
+import math
+from OpenGL.GL import *
 
 
 class Game():
@@ -20,8 +22,6 @@ class Game():
         
 
     def init_assets(self): 
-        self.bg = Background(*display.size)        
-        self.player = Player(display.size[0]*0.2, display.size[1]*0.6)
         self.panel = Panel()
 
         self.font_size = 48 
@@ -32,8 +32,15 @@ class Game():
         self.tile_map.load_sprite_maps()
         self.load_level(1)  
         #self.player.set_map_size(TILE_MAP_LEVELS[1])
-        
 
+        # player
+        self.MAP_WIDTH = TILE_MAP_LEVELS[1][0] * TILE_SIZE
+        self.MAP_HEIGHT = TILE_MAP_LEVELS[1][1] * TILE_SIZE
+        self.camera_init_pos = (self.MAP_WIDTH*0.01, self.MAP_HEIGHT*0.9)
+        #self.camera.set_camera(*pos)
+        self.player = Player(self.MAP_WIDTH, self.MAP_HEIGHT, self.camera_init_pos)
+        self.bg = Background(self.MAP_WIDTH, self.MAP_HEIGHT)   
+               
         #game globals  
         self.client = False
         self.server = False
@@ -68,37 +75,23 @@ class Game():
         self.life_delay = 20
         self.life_show = True
                        
-        self.ground = pygame.sprite.Group() 
-        self.background = pygame.sprite.Group()
-        self.items = pygame.sprite.Group()
-        self.coins = pygame.sprite.Group()
-        self.enemies = pygame.sprite.Group() 
-        #self.fire_pit = pygame.sprite.Group() 
-        self.fire_pit = []    
-        self.boss_fire_list = pygame.sprite.Group() 
         
-        #load map and get boundary limits
-        #self.map_size = self.open_map()
-        
-        # aux lists
-        self.loot = pygame.sprite.Group()
-        self.loot.add(self.items)
-        self.loot.add(self.coins)
-        self.solid = pygame.sprite.Group()
-        self.solid.add(self.ground)
-        self.solid.add(self.items)
-        self.hazard = pygame.sprite.Group()
-        self.hazard.add(self.enemies) 
-
 
 
     def load_level(self, idx:int):
         self.level = Level(idx, self.tile_map)
         self.cenario = Cenario(self.level)
-        self.camera = Camera(self.cenario)
+        #self.camera = Camera(self.cenario)
+        self.camera = Camera(display.w, display.h)
 
 
-    def start(self):
+    def start(self):        
+        self.camera.set_camera(0, self.camera_init_pos[1])
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+                
+        glLoadIdentity()
+        glTranslatef(-int(self.camera.x), -int(self.camera.y), 0)
+
         self.running = True 
         self.sound_on = True
         sounds.play_new_game_music()
@@ -116,17 +109,31 @@ class Game():
         exit()
 
 
-    def update(self, dt):
-        self.camera.update(dt)        
+    def update(self, dt):        
         self.player.update(dt)
         self.panel.update(dt)
 
+        self.camera.update(dt, self.player)
 
-    def draw(self):        
+
+    def draw(self):      
+        # Render Phase
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)        
+        glLoadIdentity()
+
+        # Save the base matrix state
+        glPushMatrix()
+        # Apply camera translations (moves the world relative to camera)
+        glTranslatef(-int(self.camera.x), -int(self.camera.y), 0)
+        
         self.bg.draw()
-        self.camera.draw()
-        self.panel.draw()
+        self.cenario.draw()        
         self.player.draw()
+
+        # Restore matrix state to clear the translation for UI elements
+        glPopMatrix()
+
+        self.panel.draw()
 
 
 game = Game() 
