@@ -80,8 +80,7 @@ class Game():
 
     def load_level(self, idx:int):
         self.level = Level(idx, self.tile_map)
-        self.cenario = Cenario(self.level)
-        #self.camera = Camera(self.cenario)
+        self.cenario = Cenario(self.level)        
         self.camera = Camera(display.w, display.h)
 
 
@@ -109,10 +108,16 @@ class Game():
         exit()
 
 
-    def update(self, dt):        
-        self.player.update(dt)
-        self.panel.update(dt)
+    def update(self, dt):  
+        self.player.handle_input()
+        
+        # Reset on_ground before sub-steps; any ground contact during steps sets it True        
+        sub_dt = dt / SUB_STEPS
+        for _ in range(SUB_STEPS):
+            self.player.physics_step(sub_dt, self.cenario.colliders)
 
+        self.player.update(dt)        
+        self.panel.update(dt)
         self.camera.update(dt, self.player)
 
 

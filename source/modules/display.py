@@ -14,7 +14,7 @@ class Display():
 
         # display info and sizes
         num_displays = pygame.display.get_num_displays()    
-        self.selected_display = 0 
+        self.selected_display = 0
         desktop_sizes = pygame.display.get_desktop_sizes()                
         self.size = desktop_sizes[self.selected_display]
         self.w, self.h = self.size
@@ -32,7 +32,7 @@ class Display():
         #flags = pygame.SCALED | pygame.FULLSCREEN  # pixel art  
         flags = FULLSCREEN | DOUBLEBUF | OPENGL   #| pygame.HWSURFACE   
         # ligar vsync no final com fps limitado ex. 60
-        pygame.display.gl_set_attribute(pygame.GL_DOUBLEBUFFER, 1)
+        #pygame.display.gl_set_attribute(pygame.GL_DOUBLEBUFFER, 1)
         self.screen = pygame.display.set_mode(self.size, 
                                               flags, 
                                               display=self.selected_display, 
@@ -48,7 +48,7 @@ class Display():
         glLoadIdentity()
 
         # Enable Blending for Alpha/Transparency
-        glShadeModel(GL_SMOOTH)
+        #glShadeModel(GL_SMOOTH)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         #glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)

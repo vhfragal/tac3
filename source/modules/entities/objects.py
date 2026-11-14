@@ -1,5 +1,6 @@
 import pygame
 from .tiles import Tile
+from ..utils import utils
 
 
 class Sprite(pygame.sprite.Sprite):
@@ -16,13 +17,15 @@ class Sprite(pygame.sprite.Sprite):
         # return a width and height of an image
         self.size = self.image.get_size()  
         self.rect = tile.rect
+
+        self.texture_id = utils.surface_to_texture(self.image)
       
 
     def update(self):
         pass
 
     def draw(self): 
-        pass
+        utils.draw_textured_quad(self.texture_id, *self.rect)
 
 
 class FixObj(Sprite):

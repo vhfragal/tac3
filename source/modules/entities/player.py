@@ -3,6 +3,7 @@ from ..constants import *
 from ..utils import utils
 from ..config.sounds import sounds
 from ..display import display
+from ..ui.cenario import Cenario
 
 
 class Player():
@@ -10,8 +11,7 @@ class Player():
     def __init__(self, map_w:int, map_h:int, pos:tuple[int,int]):
         self.MAP_WIDTH = map_w
         self.MAP_HEIGHT = map_h
-        #self.pos = pygame.math.Vector2(self.MAP_WIDTH*0.4, self.MAP_HEIGHT*0.7)
-
+       
         self.frame_index = 0
         self.frame_speed = 16
         self.current_frame = 0.0
@@ -38,13 +38,30 @@ class Player():
 
 
         self.image = img
-        self.rect = self.image.get_frect(topleft=pos)        
+        self.rect = pygame.Rect(0, 0, SIZE_PLAYER[0], SIZE_PLAYER[1])
+        self.rect.topleft = pos
+        
         #self.texture_stand_right = self.textures_walk_right[0]
         #self.texture_stand_left = self.textures_walk_left[0]
 
         img = pygame.image.load(f"assets/image/walk/stand.png").convert_alpha()
         img = pygame.transform.smoothscale(img, SIZE_PLAYER) 
+        pygame.draw.rect(img, "blue", (0, 0, self.rect.w, self.rect.h), 2)
         self.texture_stand = utils.surface_to_texture(img)
+        
+
+        # collision rect
+        self.rect_colli = img.get_rect()        
+        self.rect_colli.midbottom = self.rect.midbottom        
+        self.img_colli = pygame.Surface(SIZE_PLAYER, pygame.SRCALPHA)
+        #self.img_colli.fill("black")
+        self.img_colli = pygame.transform.smoothscale(self.img_colli, SIZE_PLAYER)
+        pygame.draw.rect(self.img_colli, "red", (0, 0, self.rect.w, self.rect.h), 2)
+        diff_x = (self.rect_colli.x - self.rect.x) // 2
+        diff_y = (self.rect_colli.y - self.rect.y) // 2
+        pygame.draw.rect(self.img_colli, "green", (diff_x, diff_y, self.rect_colli.w, self.rect_colli.h), 2)
+        self.texture_img_colli = utils.surface_to_texture(self.img_colli)
+
 
         img = pygame.image.load(f"assets/image/walk/jump_stand.png").convert_alpha()
         img = pygame.transform.smoothscale(img, SIZE_PLAYER) 
@@ -52,14 +69,15 @@ class Player():
          
         # Vetores de movimento e física
         self.direction = pygame.math.Vector2(0, 0)
+        # Use floats for exact sub-pixel positions
+        self.pos = pygame.math.Vector2(pos[0], pos[1])
+        self.vel = pygame.math.Vector2(0, 0)
         
         # movement
-        self.speed_boost = 1.5
-        self.speed_h = 0  # pixel * delta time
-        self.speed_v = 0
+        self.speed_boost = 1.5        
         self.speed_walk = 300
         self.speed_jump = -900        
-        self.onground = False
+        self.on_ground = False
         self.gravity = 1400
 
         # change jump 
@@ -90,64 +108,91 @@ class Player():
   
 
    
-    def get_input(self, dt:float):
+    def handle_input(self):
         key = pygame.key.get_pressed()
-               
+        self.vel.x = 0
+
         # Movimentação Horizontal
         if key[pygame.K_LEFT] or key[pygame.K_a]: self.direction.x = -1        
         elif key[pygame.K_RIGHT] or key[pygame.K_d]: self.direction.x = 1
         else: self.direction.x = 0
 
         # walk 
-        self.speed_h = self.direction.x * self.speed_walk
+        self.vel.x = self.direction.x * self.speed_walk
+        # run
+        if key[pygame.K_LCTRL]:            
+            self.vel.x *= self.speed_boost            
 
-        #run
-        if key[pygame.K_LCTRL] and self.onground:            
-            self.speed_h *= 1.5
 
-        # gravity
-        self.speed_v += self.gravity * dt  
-        if self.speed_v > 0: self.direction.y = 1
-        elif self.speed_v < 0: self.direction.y = -1
+    def physics_step(self, dt:float, colliders:list[pygame.Rect]):
+        # gravity           
+        if self.vel.y > 0: 
+            self.direction.y = 1           
+        elif self.vel.y < 0: 
+            self.direction.y = -1
         else: self.direction.y = 0
+        self.vel.y += self.gravity * dt 
 
-        # update rect pos
-        self.rect.x += self.speed_h * dt
-        self.rect.y += self.speed_v * dt
+        # movement X     
+        if self.rect.x < 0: 
+            self.pos.x = 0 
+        elif self.rect.x > self.MAP_WIDTH - self.rect.w: 
+            self.pos.x = self.MAP_WIDTH - self.rect.w  
+        else: 
+            self.pos.x += self.vel.x * dt
+        self.rect.x = round(self.pos.x)
+        self.check_collision_x(colliders)
 
-        #self.pos.x = max(0, min(self.rect.x, self.MAP_WIDTH))
-        #self.pos.y = max(0, min(self.rect.y, self.MAP_HEIGHT))
-        
-
-    def update(self, dt): 
-        self.speed_h = 0                
-        #self.onground = self.check_collision(0, 1, boxes, "UP")
-        #self.onceil = self.check_collision(0, -1, boxes, "DOWN")
-        
-        self.update_frame(dt)
-        self.get_input(dt)
-        
-
-        #all sides- dont go out of screen
-        '''right = self.rect.right > display.w
-        left = self.rect.left < 0
-        up = self.rect.top < 0
-        down = self.rect.bottom > display.h
-        if right: self.rect.right = display.w
-        if left: self.rect.left = 0
-        if up: self.rect.top = 0
-        if down: 
-            self.rect.bottom = display.h
-            self.onground = True'''
-
-        # Limites do mapa para o jogador
-        if self.rect.x < 0: self.rect.x = 0
-        if self.rect.x > self.MAP_WIDTH - self.rect.w: self.rect.x = self.MAP_WIDTH - self.rect.w
+        # movement Y
+        if self.rect.y != round(self.pos.y):            
+            self.on_ground = False
         if self.rect.y > self.MAP_HEIGHT - self.rect.h:
-            self.rect.y = self.MAP_HEIGHT - self.rect.h
-            #self.vy = 0
-            self.speed_v = 0
-            self.onground = True
+            self.pos.y = self.MAP_HEIGHT - self.rect.h           
+            self.vel.y = 0
+            self.on_ground = True
+        else:
+            self.pos.y += self.vel.y * dt
+        
+        self.rect.y = round(self.pos.y)
+        self.check_collision_y(colliders)
+        
+        self.rect_colli.midbottom = self.rect.midbottom
+
+
+    def check_collision_x(self, colliders:list[pygame.Rect]):
+        for platform in colliders:
+            if self.rect.colliderect(platform):
+                #if self.rect.bottom - platform.top <= 2 and self.vel.y >= 0:
+                #    print(self.rect, self.rect_colli)
+                #    continue
+                if self.vel.x > 0:  # Moving right; hit left side of platform
+                    self.rect.right = platform.left
+                    self.vel.x = 0
+                elif self.vel.x < 0:  # Moving left; hit right side of platform
+                    self.rect.left = platform.right
+                    self.vel.x = 0
+
+                # Sync float position with corrected Rect position
+                self.pos.x = self.rect.x
+
+    def check_collision_y(self, colliders:list[pygame.Rect]):
+        for platform in colliders:
+            if self.rect.colliderect(platform):                
+                if self.vel.y > 0:  # Falling down; hit top of platform
+                    self.rect.bottom = platform.top
+                    self.vel.y = 0
+                    self.on_ground = True
+                elif self.vel.y < 0:  # Jumping up; hit bottom of platform
+                    self.rect.top = platform.bottom
+                    self.vel.y = 0
+
+                # Sync float position with corrected Rect position
+                self.pos.y = self.rect.y
+
+
+    def update(self, dt):        
+        self.update_frame(dt)
+       
 
        
 
@@ -164,13 +209,10 @@ class Player():
         
 
     def draw(self):
-        x,y,w,h = self.rect.x, self.rect.y, self.rect.w, self.rect.h 
-        #x = int(self.pos.x - offset_camera.x)
-        #y = int(self.pos.y - offset_camera.y)
-        #w,h = self.rect.w, self.rect.h
-        
+        #x,y,w,h = self.rect.x, self.rect.y, self.rect.w, self.rect.h 
+       
         texture = self.texture_stand 
-        if not self.onground:    # pulando
+        if not self.on_ground:    # pulando
             texture = self.texture_jump_stand
             if self.direction.x == 1:   # direita
                 if self.direction.y > 0: # descendo
@@ -195,4 +237,7 @@ class Player():
                 texture = self.textures_walk_right[self.frame_index]
             elif self.direction.x == -1:
                 texture = self.textures_walk_left[self.frame_index]        
-        utils.draw_textured_quad(texture, x,y,w,h)
+        utils.draw_textured_quad(texture, *self.rect)
+
+        #if debug:
+        utils.draw_textured_quad(self.texture_img_colli, *self.rect_colli)

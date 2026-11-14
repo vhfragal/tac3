@@ -1,9 +1,9 @@
-import pygame
+'''import pygame
 from ..utils import utils
 from .cenario import Cenario
 from ..display import display
 from ..events.notify import notify
-from ..constants import *
+from ..constants import *'''
 from ..entities.player import Player
 
 
@@ -13,7 +13,7 @@ class Camera:
         self.y = 0
         self.width = width
         self.height = height
-        self.lerp_factor = 100.1 # Velocidade da fluidez (quanto menor, mais suave/atrasada)
+        self.lerp_factor = 0.05 # Velocidade da fluidez (quanto menor, mais suave/atrasada)
 
     def update(self, dt:float, player:Player):
         # Centraliza a câmera no jogador
@@ -21,9 +21,9 @@ class Camera:
         target_y = player.rect.y + player.rect.h / 2 - self.height / 2
 
         # LERP (Interpolação Linear)
-        self.x += int((target_x - self.x) * self.lerp_factor * dt)
-        self.y += int((target_y - self.y) * self.lerp_factor * dt)
-        print(self.x, self.y)
+        self.x += int((target_x - self.x) * self.lerp_factor )
+        self.y += int((target_y - self.y) * self.lerp_factor )
+        #print(self.x, self.y)
  
         # Limites da câmera no mapa (Clamp)
         if self.x < 0: self.x = 0

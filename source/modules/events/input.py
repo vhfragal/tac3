@@ -27,14 +27,15 @@ def inputs():
    
 def check_keys(event:pygame.Event):
     if event.type == pygame.KEYDOWN:        
-        if event.key == pygame.K_UP and game.player.onground:
-            game.player.speed_v = game.player.speed_jump
-            game.player.onground = False
+        if event.key == pygame.K_UP and game.player.on_ground:
+            game.player.vel.y = game.player.speed_jump
+            game.player.on_ground = False
             sounds.play_sound(sounds.sound_jump, 2)
         
     if event.type == pygame.KEYUP:
         if event.key == pygame.K_UP:
-            if game.player.speed_v < 0: game.player.speed_v *= 0.35
+            if game.player.vel.y < 0: 
+                game.player.vel.y *= 0.35
 
   
 

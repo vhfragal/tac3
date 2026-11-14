@@ -33,7 +33,7 @@ class Utils():
         texture_list.append(self.surface_to_texture(img))
 
 
-    def surface_to_texture(self, pygame_surface:pygame.Surface):
+    def surface_to_texture(self, pygame_surface:pygame.Surface, desc=""):
         """
         Converte um Pygame Surface em uma textura OpenGL e retorna o ID da textura.
         """
@@ -44,6 +44,7 @@ class Utils():
         # Usamos RGBA para garantir suporte a transparências (PNGs, etc.)
         texture_data = pygame.image.tobytes(flipped_surface, "RGBA", True)
         width, height = flipped_surface.get_size()
+        #print(width, height, desc)
         
         # 3. Gera um ID único para a textura no OpenGL
         texture_id = glGenTextures(1)

@@ -8,13 +8,14 @@ from .ui.menu import *
 #from .constants import *
 import threading
 from .maker.main_loop import level_maker
+from .events.collision import check_collision
 
 class GameEngine:
     """A Engine Pura: Controla o ciclo de vida, janelas, eventos e loops."""
     def __init__(self):
-        pygame.mixer.pre_init(44100, -16, 2, 512)
+        pygame.mixer.pre_init(44100, 16, 32, 512)
         pygame.init() # load all modules     
-        pygame.mixer.set_num_channels(32)  
+        #pygame.mixer.set_num_channels(32)  
         #pygame.joystick.init()        
         pass
              
@@ -168,9 +169,9 @@ class GameEngine:
 
     def update(self, dt):
         """Loop de Atualização: Onde a lógica matemática acontece"""
-        # new thread!                
-        # check_collisions()
+        # new thread!       
         game.update(dt)
+        #check_collision()
         
             
     def draw(self):

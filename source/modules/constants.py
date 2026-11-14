@@ -1,10 +1,10 @@
 import pygame
 
 TITLE = "Game TAC3"
-FPS = 60
+FPS = 0
 SCALE = 2       # clear config file if changed
 GRAVITY = 1500
-GRAVITY_EXTRA = 4000
+SUB_STEPS = 4
 
 
 COLOR_TEXT = pygame.Color("#087204")
@@ -22,7 +22,7 @@ COLOR_TEXT_1 = WHITE
 COLOR_TEXT_2 = ORANGE
 COLOR_TEXT_3 = RED
 
-SIZE_PLAYER = (45*SCALE, 75*SCALE)
+SIZE_PLAYER = (30*SCALE, 50*SCALE)
 SIZE_ICON = (40,40)
 SIZE_SCROLL = 30
 
